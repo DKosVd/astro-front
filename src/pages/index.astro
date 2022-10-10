@@ -1,0 +1,22 @@
+---
+const cookie = Astro.request.headers.get('cookie');
+console.log(cookie)
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+		<link rel="stylesheet" href="/assets/plugins/global/plugins.bundle.css"/>
+		<link rel="stylesheet" href="/assets/css/style.bundle.css"/>
+		
+	</head>
+	<body class="h-35px">
+		<h1>Astro</h1>
+		<script is:inline src="/assets/plugins/global/plugins.bundle.js"></script>
+		<script is:inline src="/assets/js/scripts.bundle.js"></script>
+	</body>
+</html>
