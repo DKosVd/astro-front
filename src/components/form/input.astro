@@ -1,0 +1,16 @@
+---
+interface Props {
+    id: string;
+    type: string;
+    textLabel: string;
+    placeholder: string;
+}
+
+const {id, type, placeholder, textLabel} = Astro.props;
+---
+
+
+<div class="mb-10">
+    <label for={id} class="required form-label">{textLabel}</label>
+    <input id={id} name={id} type={type as any} class="form-control" placeholder={placeholder}/>
+</div>

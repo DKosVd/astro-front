@@ -1,0 +1,13 @@
+---
+    import Input from './input.astro';
+    import Form from '../../layouts/Form.astro';
+---
+
+
+<form id="register">
+    <Form title="RegisterForm" btnText="Register" source="/login" sourceText="f you have account, login now">
+        <Input id="name" type="text" placeholder="Input name" textLabel="Name"/>
+        <Input id="email" type="email" placeholder="Input email" textLabel="Email"/>
+        <Input id="password" type="password" placeholder="Input password" textLabel="Password"/>
+    </Form>
+</form>

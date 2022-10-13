@@ -1,0 +1,19 @@
+---
+import { IProduct } from "../../ts/api/products";
+
+    const { product } = Astro.props ;
+    const {id, title, price, image}:IProduct = product;
+---
+
+<div class="card shadow-sm" data-bs-target="#modal_open" data-bs-toggle="modal" id={id}>
+    <div class="card-header">
+        <h3 class="card-title">{title}</h3>
+    </div>
+    <div class="card-body p-0">
+        <div class="card-p mb-10">Price: {price}</div>
+
+        <div class="text-center px-4">
+            <img class="mw-100 mh-300px card-rounded-bottom" alt="" src={image}/>
+        </div>
+    </div>
+</div>
