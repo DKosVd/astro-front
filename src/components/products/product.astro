@@ -5,9 +5,20 @@ import { IProduct } from "../../ts/api/products";
     const {id, title, price, image}:IProduct = product;
 ---
 
-<div class="card shadow-sm" data-bs-target="#modal_open" data-bs-toggle="modal" id={id}>
+<div class="card shadow-sm" style="flex: 0 0 calc(33% - 0.75rem);" data-bs-target="#modal_open" data-bs-toggle="modal" id={id}>
     <div class="card-header">
         <h3 class="card-title">{title}</h3>
+        <div class="card-toolbar">
+            <button type="button" class="btn btn-sm btn-success btn-add" data-action="add">
+                Add
+            </button>
+            <button type="button" class="btn btn-sm btn-light btn-edit" data-action="edit">
+                Edit
+            </button>
+            <button type="button" class="btn btn-sm btn-danger btn-delete" data-action="delete">
+                Delete
+            </button>
+        </div>
     </div>
     <div class="card-body p-0">
         <div class="card-p mb-10">Price: {price}</div>
