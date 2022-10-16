@@ -1,4 +1,6 @@
 import { IProduct } from './api/products'
+import { IProductCart } from './cart';
+import { IEditProduct } from './products';
 
 interface IModalClass {
 
@@ -75,6 +77,8 @@ class ModalBodyView extends Modal {
 }
 
 class ModalBodyEdit extends Modal {
+    private handlerForEditProduct: (info: IEditProduct) => void;
+
     constructor() {
         super();
     }
@@ -86,11 +90,11 @@ class ModalBodyEdit extends Modal {
         content.innerHTML = `
             <div class="mb-10">
                 <label for="title" class="required form-label">Title</label>
-                <input id="title" type="text" class="form-control form-control-solid" placeholder="Title" value=${title} />
+                <input id="title" name="title" type="text" class="form-control form-control-solid" placeholder="Title" value=${title} />
             </div>
             <div class="mb-10">
                 <label for="image" class="required form-label">Image</label>
-                <input id="image" type="text" class="form-control form-control-solid" placeholder="Image" value=${image} />
+                <input id="image"name="img" type="text" class="form-control form-control-solid" placeholder="Image" value=${image} />
             </div>
             <div class="mb-10">
                 <label for="price" class="required form-label">Price</label>
@@ -99,16 +103,43 @@ class ModalBodyEdit extends Modal {
             <button class='btn btn-primary' type='submit'>Accept</button>
         `;
         this.setContent(content);
+        this.setListenersForm();
+    }
+
+    setListenersForm() {
+        this.content.addEventListener('submit', this.acceptChange);
+    }
+
+
+    setHandlerForEditProduct = (fn: (info: IEditProduct) => void) => {
+        this.handlerForEditProduct = fn;
+    }
+
+    acceptChange = (e: Event) => {
+        e.preventDefault();
+        const formData = new FormData(e.target as HTMLFormElement);
+        this.handlerForEditProduct({
+            title: formData.get('title').toString(),
+            img: formData.get('img').toString(),
+            price: +formData.get('price')
+        });
+        for(const pair of formData.entries()) {
+            console.log(pair)
+        }
+
     }
 }
 
 class ModalBodyDelete extends Modal {
-    private fn: () => void;
+    private deleteElementHandler: () => void;
+    private deleteElementFromCart: (product: IProduct) => void;
+    private product: IProduct;
     constructor() {
         super();
     }
 
-    createBodyContent() {
+    createBodyContent(product: IProduct) {
+        this.product = product;
         this.setTitle('Delete product')
         const content = document.createElement('div');
         content.classList.add('d-flex', 'flex-center', 'gap-5');
@@ -120,8 +151,12 @@ class ModalBodyDelete extends Modal {
         this.addListenerToButtons();
     }
 
+    setDeleteElementFromCart(fn: (product: IProduct) => void) {
+        this.deleteElementFromCart = fn;
+    }
+
     handlerForDeleteElement(fn: () => void) {
-        this.fn = fn;
+        this.deleteElementHandler = fn;
     }
 
     private addListenerToButtons() {
@@ -141,7 +176,8 @@ class ModalBodyDelete extends Modal {
     }
 
     private accept() {
-        this.fn();
+        this.deleteElementHandler();
+        this.deleteElementFromCart(this.product);
         this.clearModalBody();
     }
 }
@@ -150,18 +186,26 @@ class ModalBodyDelete extends Modal {
 class ModalBodyAdd extends Modal {
     private counter: Element;
     private price: number;
+    private product: IProduct;
+
+    private addToCartHandler: (product: IProduct) => void;
+    private removeFromCartHanlder: (product: IProduct) => void;
+    private getValueFromCart: (product: IProduct) => any;
+    private getTotalPrice: () => void;
+
     constructor() {
         super();
     }
 
-    createBodyContent() {
+    createBodyContent(product: IProduct) {
+        this.product = product;
         const content = document.createElement('div');
         content.classList.add('d-flex', 'gap-5', 'flex-column');
         content.innerHTML = `
         <div>
             <span>Title product</span>
             <button class="btn btn-light" data-count="add">+</button>
-            <span data-counter>1</span>
+            <span data-counter>0</span>
             <button class="btn btn-light" data-count="minus">-</button>
             <span>Total price:<span class="price-for-product">price from product</span></span>
         </div>
@@ -171,11 +215,44 @@ class ModalBodyAdd extends Modal {
         `;
         this.setContent(content);
         this.addCounter();
+        this.content.querySelector('.btn-success').addEventListener('click', this.addToCart)
         this.price = 123;//Price from product
+    }
+
+    setAddToCartHandler(fn: (product: IProduct) => void) {
+        this.addToCartHandler = fn;
+    }
+
+    setRemoveFromCartHanlder(fn: (product: IProduct) => void) {
+        this.removeFromCartHanlder = fn;
+    }
+
+    setHandlerGetPrice(fn: () => void) {
+        this.getTotalPrice = fn;
+    }
+
+    setGetValueFromCart(fn: (product: IProduct) => void) {
+        this.getValueFromCart = fn;       
+    }
+
+    addToCart = () => {
+        this.getTotalPrice();
+    }
+
+    private setCurrentCount(count: number) {
+        this.counter.innerHTML = count.toString();
+    }
+
+    private setCurrentPrice(price: number) {
+        //this set price 
     }
 
     addCounter() {
         this.counter = this.content.querySelector('[data-counter]');
+        const productFromCart: IProductCart = this.getValueFromCart(this.product);
+        if(productFromCart) {
+            this.setCurrentCount(productFromCart.count);
+        }
         const add = this.content.querySelector('[data-count="add"]');
         const minus = this.content.querySelector('[data-count="minus"]');
         add.addEventListener('click', this.setCountAdd);
@@ -191,7 +268,7 @@ class ModalBodyAdd extends Modal {
         const newCount = currentCount - 1;
         if( !(newCount >= 0) ) return;
         this.counter.innerHTML = newCount.toString();
-        this.calculatePrice();
+        this.removeFromCartHanlder(this.product)
     }
 
     setCountAdd = () => {
@@ -199,11 +276,7 @@ class ModalBodyAdd extends Modal {
         const newCount = currentCount + 1;
         if( !(newCount <= 10) ) return;
         this.counter.innerHTML = newCount.toString();
-        this.calculatePrice();
-    }
-
-    calculatePrice() {
-        console.log(this.price * +this.counter.innerHTML)
+        this.addToCartHandler(this.product);
     }
 }
 export const ModalBodyV = new ModalBodyView();

@@ -8,24 +8,24 @@ const products:IProduct[] = [
         image: 'image'
     },
     {
-        id: '1',
+        id: '2',
         title: 'TITLE',
         price: 1232,
         image: 'image'
     },
     {
-        id: '1',
+        id: '3',
         title: 'TITLE',
         price: 1233,
         image: 'image'
     }, {
-        id: '1',
+        id: '4',
         title: 'TITLE',
         price: 1234,
         image: 'image'
     },
     {
-        id: '1',
+        id: '5',
         title: 'TITLE',
         price: 1235,
         image: 'image'

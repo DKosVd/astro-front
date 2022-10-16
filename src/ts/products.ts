@@ -1,22 +1,59 @@
 import { ModalBodyA, ModalBodyD, ModalBodyE, ModalBodyV } from "./modal";
+import { IProduct } from "./api/products";
+import Cart, { ICartClass } from "./cart";
+import productApi, {BaseApi} from '../ts/api/products';
 
-interface IProduct {
 
+export interface IEditProduct {
+    title: string;
+    img: string;
+    price: number;
 }
 
-export class Product implements IProduct {
+export class Product  {
     private product:Element;
-    constructor(el: Element) {
+    private handlerForCartAdd: (product: IProduct) => any;
+    private handlerForCartDelete: (product: IProduct) => any;
+    private handlerGetPrice: () => void;
+    private handlerDeleteProduct: (product: IProduct) => void;
+    private handlerGetInfoProductFromCart: (product: IProduct) => void;
+
+    constructor(el: Element, private cart: ICartClass, private productApi:BaseApi) {
         this.product = el;
         this.product.addEventListener('click', this.getTypeForModal);
+        this.setHadlerForCartAdd(this.cart.addToCart);
+        this.setHadlerForCartDelete(this.cart.deleteFromCartOneOfProduct)
+        this.setHandlerGetPrice(this.cart.getTotalPrice);
+        this.setHandlerDeleteProduct(this.cart.deleteFromCartAllOfProduct);
+        this.setHandlerGetInfoProductFromCart(this.cart.getInfoByProduct);
     }
 
-    getInfoFromProduct() {
+    getInfoFromProduct():IProduct {
         const id = this.product.getAttribute('id');
         const title = this.product.querySelector('.card-title').innerHTML;
         const image = 'img';
         const price = +this.product.querySelector('.card-body .card-p').innerHTML.split(':')[1];
         return {id, title, image, price};
+    }
+
+    setHadlerForCartAdd(fn: (product: IProduct) => void) {
+        this.handlerForCartAdd = fn;
+    }
+
+    setHadlerForCartDelete(fn: (product: IProduct) => void) {
+        this.handlerForCartDelete = fn;
+    }
+
+    setHandlerGetPrice(fn: () => void) {
+        this.handlerGetPrice = fn;
+    }
+
+    setHandlerDeleteProduct(fn: (product: IProduct) => void) {
+        this.handlerDeleteProduct = fn;
+    }
+
+    setHandlerGetInfoProductFromCart(fn: (product: IProduct) => void) {
+        this.handlerGetInfoProductFromCart = fn;
     }
 
     setInfoProduct(info: IProduct) {
@@ -28,14 +65,20 @@ export class Product implements IProduct {
         const action = product.getAttribute('data-action');
         switch(action) {
             case 'add':
-                ModalBodyA.createBodyContent();
+                ModalBodyA.setGetValueFromCart(this.handlerGetInfoProductFromCart)
+                ModalBodyA.createBodyContent(this.getInfoFromProduct());
+                ModalBodyA.setAddToCartHandler(this.handlerForCartAdd);
+                ModalBodyA.setRemoveFromCartHanlder(this.handlerForCartDelete);
+                ModalBodyA.setHandlerGetPrice(this.handlerGetPrice)
                 break;
             case 'edit':
                 ModalBodyE.createBodyContent(this.getInfoFromProduct());
+                ModalBodyE.setHandlerForEditProduct(this.editElement);
                 break;
             case 'delete':
-                ModalBodyD.createBodyContent();
-                ModalBodyD.handlerForDeleteElement(this.deleteElement());
+                ModalBodyD.createBodyContent(this.getInfoFromProduct());
+                ModalBodyD.handlerForDeleteElement(this.deleteElement);
+                ModalBodyD.setDeleteElementFromCart(this.handlerDeleteProduct);
                 break
             default:
                 ModalBodyV.createBodyContent(this.getInfoFromProduct());
@@ -43,11 +86,13 @@ export class Product implements IProduct {
         }         
     }
 
-    deleteElement() {
-        const product = this.product;
-        return () => {
-            product.remove();
-        }
+    editElement = (info: IEditProduct) => {
+        console.log(info)
+    }
+
+    deleteElement = () => {
+        this.productApi.deleteProductById(this.getInfoFromProduct().id);
+        this.product.remove();
     }
 
 }
@@ -57,7 +102,7 @@ export class Products {
     constructor() {
         this.products = document.querySelector('#products');
         if(!this.products) return;
-        Array.from(this.products.children).forEach(product => new Product(product))
+        Array.from(this.products.children).forEach(product => new Product(product, Cart.getCart(), productApi))
     }
 }
 
