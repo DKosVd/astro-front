@@ -1,3 +1,6 @@
+import {privateAxios} from "./axios";
+import axios from "./axios";
+
 export interface IProduct {
     id: string;
     title: string;
@@ -7,7 +10,7 @@ export interface IProduct {
 
 
 export interface BaseApi {
-    getProducts: () => void;
+    getProducts: (jwt: string) => void;
     getProductById: (id: string) => void;
     createProduct: (info: IProduct) => void;
     editProductById: (id: string) => void;
@@ -17,9 +20,18 @@ export interface BaseApi {
 
 class ProductsApi implements BaseApi {
     constructor() {}
-    getProducts = async () => {
-        console.log('getProducts')
-        return [] as IProduct[];
+    async getProducts(jwt: string)  {
+        try {
+            const products = await privateAxios.get('/products', {
+                headers: {
+                    Authorization: `bearer ${jwt.split('=')[1]}`
+                }
+            })
+            return [] as IProduct[];
+        } catch(err) {
+            console.log(err.message)
+        }
+      
     };
     
     getProductById = async (id: string) => {
@@ -39,4 +51,6 @@ class ProductsApi implements BaseApi {
     };
 }
 
-export default new ProductsApi();
+const Api = new ProductsApi();
+
+export default Api;
