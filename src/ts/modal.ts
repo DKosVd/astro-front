@@ -59,15 +59,15 @@ class ModalBodyView extends Modal {
 
     createBodyContent(info: IProduct) {
         this.setTitle('View Product')
-        const { title, price, image } = info
+        const { Title, Price, Image } = info
         const content = document.createElement('div');
         content.classList.add('card', 'shadow-sm');
         content.innerHTML = `
             <div class="card-header">
-                <h3 class="card-title">${title}</h3>
+                <h3 class="card-title">${Title}</h3>
             </div>
             <div class="card-body">
-                Price: ${price}
+                Price: ${Price}
             </div>
         `;
         this.setContent(content)
@@ -77,28 +77,25 @@ class ModalBodyView extends Modal {
 }
 
 class ModalBodyEdit extends Modal {
-    private handlerForEditProduct: (info: IEditProduct) => void;
-
+    private handlerForEditProduct: (id: string, info: IEditProduct) => void;
+    private product: IProduct;
     constructor() {
         super();
     }
 
     createBodyContent(info: IProduct) {
         this.setTitle('Edit product');
-        const { title, price, image } = info
+        this.product = info;
+        const { Title, Price, Image } = info
         const content = document.createElement('form');
         content.innerHTML = `
             <div class="mb-10">
                 <label for="title" class="required form-label">Title</label>
-                <input id="title" name="title" type="text" class="form-control form-control-solid" placeholder="Title" value=${title} />
-            </div>
-            <div class="mb-10">
-                <label for="image" class="required form-label">Image</label>
-                <input id="image"name="img" type="text" class="form-control form-control-solid" placeholder="Image" value=${image} />
+                <input id="title" name="title" type="text" class="form-control form-control-solid" placeholder="Title" value=${Title} />
             </div>
             <div class="mb-10">
                 <label for="price" class="required form-label">Price</label>
-                <input id="price" name='price' type="text" class="form-control form-control-solid" placeholder="Price" value=${price} />
+                <input id="price" name='price' type="text" class="form-control form-control-solid" placeholder="Price" value=${Price} />
             </div>
             <button class='btn btn-primary' type='submit'>Accept</button>
         `;
@@ -111,19 +108,19 @@ class ModalBodyEdit extends Modal {
     }
 
 
-    setHandlerForEditProduct = (fn: (info: IEditProduct) => void) => {
+    setHandlerForEditProduct = (fn: (id: string, info: IEditProduct) => void) => {
         this.handlerForEditProduct = fn;
     }
 
     acceptChange = (e: Event) => {
         e.preventDefault();
         const formData = new FormData(e.target as HTMLFormElement);
-        this.handlerForEditProduct({
-            title: formData.get('title').toString(),
-            img: formData.get('img').toString(),
-            price: +formData.get('price')
+        this.handlerForEditProduct(this.product.P_ID, {
+            Title: formData.get('title').toString(),
+            Price: +formData.get('price')
         });
         for(const pair of formData.entries()) {
+            //validate
             console.log(pair)
         }
 

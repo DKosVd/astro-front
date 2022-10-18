@@ -1,11 +1,12 @@
 import {privateAxios} from "./axios";
 import axios from "./axios";
+import { IEditProduct } from "../products";
 
 export interface IProduct {
-    id: string;
-    title: string;
-    image: string;
-    price: number;
+    P_ID: string;
+    Title: string;
+    Image: string;
+    Price: number;
 }
 
 
@@ -13,10 +14,18 @@ export interface BaseApi {
     getProducts: (jwt: string) => void;
     getProductById: (id: string) => void;
     createProduct: (info: IProduct) => void;
-    editProductById: (id: string) => void;
+    editProductById: (id: string, info: IEditProduct) => void;
     deleteProductById: (id: string) => void; 
 }
 
+interface ResponseData {
+    id: number;
+    attributes: IProduct;
+}
+
+interface Response {
+    data: ResponseData[];
+}
 
 class ProductsApi implements BaseApi {
     constructor() {}
@@ -27,7 +36,10 @@ class ProductsApi implements BaseApi {
                     Authorization: `bearer ${jwt.split('=')[1]}`
                 }
             })
-            return [] as IProduct[];
+            if(products.data) {
+                return products.data as Response;
+            }
+            return 
         } catch(err) {
             console.log(err.message)
         }
@@ -43,11 +55,23 @@ class ProductsApi implements BaseApi {
     };
 
     deleteProductById = async (id: string) => {
-        console.log('deleteProductById')
+        try {
+            const data = await privateAxios.delete(`/products/${id}`);
+        } catch(err) {
+            console.log(err)
+        }
     };
 
-    editProductById = async (id: string) => {
-        console.log('editProductById')
+    editProductById = async (id: string, info: IEditProduct) => {
+        try {
+            console.log(info)
+            const data = await privateAxios.put(`/products/${id}`, {
+                info
+            })
+            console.log(data)
+        } catch(err) {
+            console.log(err)
+        }
     };
 }
 

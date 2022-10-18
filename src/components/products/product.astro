@@ -1,13 +1,13 @@
 ---
 import { IProduct } from "../../ts/api/products";
 
-    const { product } = Astro.props ;
-    const {id, title, price, image}:IProduct = product;
+    const { product } = Astro.props;
+    const {P_ID, Title, Price, Image}:IProduct = product.attributes;
 ---
 
-<div class="card shadow-sm" style="flex: 0 0 calc(33% - 0.75rem);" data-bs-target="#modal_open" data-bs-toggle="modal" id={id}>
+<div class="card shadow-sm" style="flex: 0 0 calc(33% - 0.75rem); min-width: 250px;" data-bs-target="#modal_open" data-bs-toggle="modal" id={P_ID}>
     <div class="card-header">
-        <h3 class="card-title">{title}</h3>
+        <h3 class="card-title">{Title}</h3>
         <div class="card-toolbar">
             <button type="button" class="btn btn-sm btn-success btn-add" data-action="add">
                 Add
@@ -21,10 +21,10 @@ import { IProduct } from "../../ts/api/products";
         </div>
     </div>
     <div class="card-body p-0">
-        <div class="card-p mb-10">Price: {price}</div>
+        <div class="card-p mb-10">Price: {Price}</div>
 
         <div class="text-center px-4">
-            <img class="mw-100 mh-300px card-rounded-bottom" alt="" src={image}/>
+            <img class="mw-100 mh-300px card-rounded-bottom" alt="" src={Image}/>
         </div>
     </div>
 </div>

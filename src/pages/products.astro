@@ -4,10 +4,10 @@ import Main from '../layouts/Main.astro';
 import Products from '../components/products/products.astro';
 import productsApi from '../ts/api/products'
 
-const products = productsApi.getProducts(Astro.request.headers.get('cookie'));
+const products = await productsApi.getProducts(Astro.request.headers.get('cookie'));
 
 ---
 
 <Main title="Products">
-    <Products products={[]}/>
+    <Products products={products.data}/>
 </Main>

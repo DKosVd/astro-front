@@ -5,9 +5,8 @@ import productApi, {BaseApi} from '../ts/api/products';
 
 
 export interface IEditProduct {
-    title: string;
-    img: string;
-    price: number;
+    Title: string;
+    Price: number;
 }
 
 export class Product  {
@@ -29,11 +28,11 @@ export class Product  {
     }
 
     getInfoFromProduct():IProduct {
-        const id = this.product.getAttribute('id');
-        const title = this.product.querySelector('.card-title').innerHTML;
-        const image = 'img';
-        const price = +this.product.querySelector('.card-body .card-p').innerHTML.split(':')[1];
-        return {id, title, image, price};
+        const P_ID = this.product.getAttribute('id');
+        const Title = this.product.querySelector('.card-title').innerHTML;
+        const Image = 'img';
+        const Price = +this.product.querySelector('.card-body .card-p').innerHTML.split(':')[1];
+        return {P_ID, Title, Image, Price};
     }
 
     setHadlerForCartAdd(fn: (product: IProduct) => void) {
@@ -86,12 +85,12 @@ export class Product  {
         }         
     }
 
-    editElement = (info: IEditProduct) => {
-        console.log(info)
+    editElement = (id: string, info: IEditProduct) => {
+        this.productApi.editProductById(id, info)
     }
 
     deleteElement = () => {
-        this.productApi.deleteProductById(this.getInfoFromProduct().id);
+        this.productApi.deleteProductById(this.getInfoFromProduct().P_ID);
         this.product.remove();
     }
 
